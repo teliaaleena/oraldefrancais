@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Révision orale · Télia Moreau</title>
+<meta name="description" content="Outil personnel de révision pour l'oral du bac de français. Colle ton texte, marque les phrases clés, prépare ton plan en 3 étapes.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#f5f1e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1814" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────
+   DESIGN SYSTEM
+   ───────────────────────────────────────── */
+:root {
+  /* Light (default) — paper & ink */
+  --paper: #f5f1e8;
+  --paper-2: #ede7d8;
+  --paper-3: #e3dcc8;
+  --ink: #1a1814;
+  --ink-2: #3a342c;
+  --ink-3: #6b6357;
+  --ink-4: #968d7e;
+  --rule: #d8cfb9;
+  --rule-soft: #e3dcc8;
+  --accent: #c0533a;
+  --accent-soft: #d97757;
+  --accent-bg: rgba(192,83,58,0.08);
+  --green: #5e7a3a;
+  --green-bg: rgba(94,122,58,0.10);
+  --red: #a8392e;
+  --red-bg: rgba(168,57,46,0.08);
+  --shadow: 0 1px 0 rgba(26,24,20,0.04), 0 8px 28px -16px rgba(26,24,20,0.18);
+  --radius: 4px;
+  --radius-md: 8px;
+}
+[data-theme="dark"] {
+  --paper: #1a1814;
+  --paper-2: #221f1a;
+  --paper-3: #2a2620;
+  --ink: #ede7d8;
+  --ink-2: #c4bca8;
+  --ink-3: #8a8275;
+  --ink-4: #5d574c;
+  --rule: #3a342c;
+  --rule-soft: #2a2620;
+  --accent: #d97757;
+  --accent-soft: #e0896c;
+  --accent-bg: rgba(217,119,87,0.10);
+  --green: #91a86a;
+  --green-bg: rgba(145,168,106,0.12);
+  --red: #c95c4d;
+  --red-bg: rgba(201,92,77,0.12);
+  --shadow: 0 1px 0 rgba(0,0,0,0.4), 0 8px 28px -16px rgba(0,0,0,0.6);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Newsreader', Georgia, serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.55;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+/* Paper grain */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 1;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+}
+[data-theme="dark"] body::before { opacity: 0.55; }
+
+/* ─────────────────────────────────────────
+   TYPOGRAPHY
+   ───────────────────────────────────────── */
+.serif { font-family: 'Fraunces', Georgia, serif; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+h1, h2, h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 144;
+  color: var(--ink);
+  letter-spacing: -0.018em;
+}
+.label {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.eyebrow {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-3);
+}
+.eyebrow::before { content: '— '; color: var(--accent); }
+
+/* ─────────────────────────────────────────
+   LAYOUT
+   ───────────────────────────────────────── */
+.shell {
+  position: relative; z-index: 2;
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+}
+.view { display: none; flex: 1; }
+.view.active { display: flex; flex-direction: column; }
+
+/* ─────────────────────────────────────────
+   TOP BAR
+   ───────────────────────────────────────── */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 24px 48px;
+  border-bottom: 1px solid var(--rule);
+}
+.topbar a, .topbar a:visited {
+  color: var(--ink-3);
+  text-decoration: none;
+  font-style: italic;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+.topbar a:hover { color: var(--accent); }
+.topbar .home::before { content: '← '; }
+.topbar-right { display: flex; gap: 20px; align-items: baseline; }
+.theme-btn {
+  background: none; border: none; cursor: pointer;
+  font-family: 'Newsreader', Georgia, serif; font-style: italic;
+  font-size: 14px; color: var(--ink-3); padding: 0;
+  transition: color 0.2s;
+}
+.theme-btn:hover { color: var(--accent); }
+
+/* ─────────────────────────────────────────
+   LIBRARY
+   ───────────────────────────────────────── */
+#library .header {
+  padding: 56px 48px 32px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: end;
+  border-bottom: 1px solid var(--rule);
+}
+#library .title-block .eyebrow { display: block; margin-bottom: 12px; }
+#library h1 {
+  font-size: clamp(40px, 5vw, 56px);
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  line-height: 1.0;
+  margin-bottom: 10px;
+}
+#library h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 400;
+}
+#library .subtitle {
+  font-size: 16px;
+  color: var(--ink-3);
+  font-style: italic;
+  max-width: 50ch;
+}
+.lib-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--ink-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.18s;
+  text-decoration: none;
+  letter-spacing: 0.005em;
+}
+.btn:hover {
+  background: var(--paper-2);
+  border-color: var(--ink-4);
+  color: var(--ink);
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+  font-weight: 500;
+}
+.btn-primary:hover {
+  background: var(--accent);
+  color: var(--paper);
+  border-color: var(--accent);
+}
+.btn-accent {
+  background: var(--accent);
+  color: var(--paper);
+  border-color: var(--accent);
+}
+.btn-accent:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--paper);
+}
+.btn-quiet {
+  background: transparent;
+  border: none;
+  color: var(--ink-3);
+  padding: 8px 12px;
+}
+.btn-quiet:hover { color: var(--accent); background: transparent; }
+.btn-italic {
+  font-style: italic;
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 400;
+}
+
+/* Library grid */
+#library .grid-wrap {
+  padding: 32px 48px 80px;
+  flex: 1;
+}
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.text-card {
+  background: var(--paper);
+  padding: 28px 28px 24px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+}
+.text-card:hover { background: var(--paper-2); }
+.text-card .card-actions {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.text-card:hover .card-actions { opacity: 1; }
+.card-action-btn {
+  width: 28px; height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius);
+  transition: all 0.15s;
+  padding: 0;
+}
+.card-action-btn:hover { background: var(--paper-3); color: var(--ink); }
+.card-action-btn.delete:hover { color: var(--red); background: var(--red-bg); }
+.text-card .card-num {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-4);
+  margin-bottom: 10px;
+}
+.text-card h3 {
+  font-size: 22px;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  font-weight: 400;
+  padding-right: 60px;
+  font-variation-settings: 'opsz' 36;
+}
+.text-card .preview {
+  font-size: 14px;
+  color: var(--ink-3);
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: auto;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.text-card .card-foot {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule-soft);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-4);
+}
+.text-card .card-foot .progress-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.text-card .card-foot .status-dots {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.status-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+.status-dot::before {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+.status-dot.correct { color: var(--green); }
+.status-dot.correct::before { background: var(--green); }
+.status-dot.revoir { color: var(--red); }
+.status-dot.revoir::before { background: var(--red); }
+.text-card .progress-line {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+.empty-state {
+  grid-column: 1/-1;
+  background: var(--paper);
+  padding: 80px 32px;
+  text-align: center;
+  color: var(--ink-3);
+  font-style: italic;
+  font-size: 18px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 300;
+}
+.empty-state::before {
+  content: '';
+  display: block;
+  width: 40px; height: 1px;
+  background: var(--accent);
+  margin: 0 auto 24px;
+}
+
+/* ─────────────────────────────────────────
+   NEW TEXT FORM
+   ───────────────────────────────────────── */
+#new-text .container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 56px 48px 96px;
+  width: 100%;
+}
+.page-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-3);
+  text-decoration: none;
+  margin-bottom: 32px;
+  cursor: pointer;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.page-back:hover { color: var(--accent); }
+.page-back::before { content: '←'; }
+.page-title {
+  font-size: clamp(36px, 5vw, 48px);
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  line-height: 1.05;
+  margin-bottom: 8px;
+}
+.page-title em { font-style: italic; color: var(--accent); }
+.page-subtitle {
+  color: var(--ink-3);
+  font-size: 17px;
+  font-style: italic;
+  margin-bottom: 40px;
+  max-width: 50ch;
+}
+.stats-row {
+  display: flex; gap: 32px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule);
+}
+.stat {
+  display: flex; flex-direction: column;
+  gap: 4px;
+}
+.stat .stat-num {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stat .stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+}
+.field-block { margin-bottom: 28px; }
+.field-block label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.input, .textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 8px 0 12px;
+  color: var(--ink);
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 18px;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: vertical;
+  line-height: 1.55;
+}
+.textarea { min-height: 80px; }
+.textarea.large {
+  min-height: 320px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  background: var(--paper-2);
+  padding: 18px 20px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+}
+.input:focus, .textarea:focus {
+  border-color: var(--accent);
+}
+.help-box {
+  background: var(--paper-2);
+  border-left: 2px solid var(--accent);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  font-style: italic;
+}
+.help-box code {
+  font-family: 'JetBrains Mono', monospace;
+  font-style: normal;
+  font-size: 12px;
+  background: var(--paper-3);
+  padding: 2px 5px;
+  border-radius: var(--radius);
+  color: var(--accent);
+}
+.form-actions {
+  display: flex; gap: 12px;
+  justify-content: flex-end;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+/* ─────────────────────────────────────────
+   STUDY VIEW
+   ───────────────────────────────────────── */
+#study { display: none; flex-direction: column; }
+#study.active { display: flex; }
+.study-topbar {
+  padding: 18px 48px;
+  border-bottom: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 24px;
+  align-items: center;
+}
+.study-back {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0;
+}
+.study-back:hover { color: var(--accent); }
+.study-back::before { content: '← '; }
+.study-title-wrap h2 {
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 36;
+  margin-bottom: 4px;
+}
+.study-meta {
+  font-size: 12px;
+  color: var(--ink-3);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+}
+.study-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 160px;
+}
+.study-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.study-bar {
+  flex: 1;
+  height: 2px;
+  background: var(--rule);
+  overflow: hidden;
+}
+.study-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.5s ease;
+}
+.study-tools {
+  display: flex; gap: 4px;
+  align-items: center;
+}
+.tool-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--ink-3);
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.15s;
+}
+.tool-btn:hover { color: var(--accent); border-color: var(--rule); }
+
+/* Steps nav */
+.steps-nav {
+  display: flex;
+  border-bottom: 1px solid var(--rule);
+  padding: 0 48px;
+  background: var(--paper);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.steps-nav::-webkit-scrollbar { display: none; }
+.step-tab {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 18px 28px 18px 0;
+  margin-right: 28px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-family: 'Newsreader', Georgia, serif;
+  color: var(--ink-3);
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-bottom: -1px;
+  font-size: 16px;
+}
+.step-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+.step-tab.done { color: var(--green); }
+.step-tab.locked { cursor: not-allowed; opacity: 0.4; }
+.step-roman {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 300;
+}
+.step-tab.active .step-roman { color: var(--accent); }
+.step-tab.done .step-roman { color: var(--green); }
+.step-name { font-size: 16px; }
+
+/* Step content */
+.step-content {
+  flex: 1;
+  padding: 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+.stage-hint {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin-bottom: 40px;
+  padding-left: 20px;
+  border-left: 2px solid var(--accent);
+  max-width: 65ch;
+}
+
+/* STEP 1 fields */
+.fields-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+.field-card {
+  background: transparent;
+}
+.field-card.full { grid-column: 1/-1; }
+.field-roman {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 14px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.field-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 24px;
+  font-weight: 400;
+  margin-bottom: 6px;
+  font-variation-settings: 'opsz' 36;
+}
+.field-subtitle {
+  font-size: 14px;
+  color: var(--ink-3);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+
+/* Step footer */
+.step-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 48px;
+  border-top: 1px solid var(--rule);
+  flex-shrink: 0;
+  background: var(--paper);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.step-footer-hint {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--ink-3);
+}
+.step-footer-hint.ready { color: var(--green); }
+
+/* STEP 2 — phrases */
+.phrases-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 48px;
+  align-items: start;
+}
+.passage-panel {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 19px;
+  line-height: 1.85;
+  color: var(--ink);
+  padding: 12px 0;
+  max-width: 65ch;
+}
+.passage-panel p { margin-bottom: 1.2em; }
+.phrase-highlight {
+  background: var(--accent-bg);
+  border-bottom: 1.5px solid var(--accent);
+  cursor: pointer;
+  padding: 0 2px;
+  transition: background 0.15s;
+  color: var(--ink);
+}
+.phrase-highlight:hover { background: rgba(192,83,58,0.18); }
+.phrase-highlight.active {
+  background: var(--accent);
+  color: var(--paper);
+  border-bottom-color: var(--accent);
+}
+.phrase-highlight.status-correct {
+  background: var(--green-bg);
+  border-bottom-color: var(--green);
+}
+.phrase-highlight.status-correct.active {
+  background: var(--green);
+  color: var(--paper);
+}
+.phrase-highlight.status-revoir {
+  background: var(--red-bg);
+  border-bottom-color: var(--red);
+}
+.phrase-highlight.status-revoir.active {
+  background: var(--red);
+  color: var(--paper);
+}
+
+.analysis-panel {
+  position: sticky;
+  top: 24px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+.panel-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.panel-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-3);
+}
+.panel-counter strong {
+  color: var(--accent);
+  font-weight: 500;
+}
+.panel-nav-btns { display: flex; gap: 4px; }
+.panel-nav-btns button {
+  background: transparent;
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  cursor: pointer;
+  width: 28px; height: 28px;
+  border-radius: var(--radius);
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+.panel-nav-btns button:hover { background: var(--paper-3); border-color: var(--ink-4); color: var(--ink); }
+.panel-phrase-text {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 19px;
+  line-height: 1.4;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+.panel-phrase-text::before { content: '« '; color: var(--accent); }
+.panel-phrase-text::after { content: ' »'; color: var(--accent); }
+.correction-area {
+  margin-bottom: 16px;
+  transition: opacity 0.2s;
+}
+.correction-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.correction-text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  font-style: italic;
+  padding: 12px 14px;
+  background: var(--paper);
+  border-radius: var(--radius);
+  border-left: 2px solid var(--accent-soft);
+}
+.phantom-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 14px 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+.masquer-btn {
+  background: none; border: none;
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-3);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+.masquer-btn:hover { color: var(--accent); }
+.toggle-wrap {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--ink-3);
+}
+.toggle {
+  position: relative;
+  width: 32px; height: 18px;
+  cursor: pointer;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--rule);
+  border-radius: 18px;
+  transition: 0.2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  left: 3px; top: 3px;
+  background: var(--paper);
+  border-radius: 50%;
+  transition: 0.2s;
+}
+.toggle input:checked + .toggle-slider { background: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(14px); }
+
+.analysis-input-area { margin-top: 14px; }
+.analysis-input-area .label-line {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--ink-3); margin-bottom: 6px; font-weight: 500;
+}
+.analysis-textarea {
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s;
+}
+.analysis-textarea:focus { border-color: var(--accent); }
+
+/* Auto-eval buttons */
+.autoeval-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+.autoeval-btn {
+  padding: 12px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink-2);
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.005em;
+}
+.autoeval-btn .glyph {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+.autoeval-btn.correct:hover, .autoeval-btn.correct.selected {
+  background: var(--green-bg);
+  border-color: var(--green);
+  color: var(--green);
+}
+.autoeval-btn.revoir:hover, .autoeval-btn.revoir.selected {
+  background: var(--red-bg);
+  border-color: var(--red);
+  color: var(--red);
+}
+.autoeval-btn.selected { font-weight: 600; }
+.kbd-hint {
+  font-size: 11px;
+  color: var(--ink-4);
+  text-align: center;
+  margin-top: 10px;
+  font-style: italic;
+}
+kbd {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px 5px;
+  color: var(--ink-2);
+}
+
+/* Review banner */
+.review-banner {
+  background: var(--red-bg);
+  border-left: 2px solid var(--red);
+  padding: 18px 24px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.review-banner .text {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 18px;
+  color: var(--ink);
+}
+.review-banner .text small {
+  display: block;
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: normal;
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+.review-banner.success {
+  background: var(--green-bg);
+  border-left-color: var(--green);
+}
+.review-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: var(--red-bg);
+  border: 1px solid var(--red);
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--red);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-left: 10px;
+  font-family: 'Newsreader', Georgia, serif;
+}
+
+/* Inline notice (replaces alerts) */
+.notice {
+  padding: 14px 18px;
+  border-left: 2px solid var(--accent);
+  background: var(--accent-bg);
+  font-style: italic;
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 300;
+  font-size: 16px;
+  color: var(--ink);
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.notice.success { background: var(--green-bg); border-color: var(--green); }
+.notice.error { background: var(--red-bg); border-color: var(--red); }
+.notice .dismiss {
+  background: none; border: none; cursor: pointer;
+  color: var(--ink-3); font-size: 18px; font-style: normal;
+}
+
+/* STEP 3 — synthese */
+.synthese-block {
+  margin-bottom: 36px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--rule);
+}
+.synthese-block:last-of-type { border-bottom: none; }
+.synthese-block h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 26px;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 36;
+  margin-bottom: 6px;
+}
+.synthese-block .opt-tag {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-3);
+  margin-left: 10px;
+  text-transform: lowercase;
+  letter-spacing: 0;
+}
+.synthese-block .roman-num {
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.synthese-field { margin-top: 18px; }
+.synthese-field-label {
+  display: flex; justify-content: space-between;
+  align-items: baseline;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.field-state {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: 12px;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+.field-state.empty { color: var(--ink-4); }
+.field-state.filled { color: var(--green); }
+.synthese-textarea {
+  width: 100%;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  outline: none;
+  resize: vertical;
+  min-height: 70px;
+  transition: border-color 0.2s;
+}
+.synthese-textarea:focus { border-color: var(--accent); }
+
+/* Roulette modal */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(26,24,20,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+[data-theme="dark"] .modal-overlay { background: rgba(0,0,0,0.7); }
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 36px 32px 28px;
+  width: 100%; max-width: 480px;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+.modal h2 {
+  font-size: 28px;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 36;
+  margin-bottom: 6px;
+}
+.modal h2 em { font-style: italic; color: var(--accent); }
+.modal p {
+  color: var(--ink-3);
+  font-style: italic;
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none;
+  color: var(--ink-3); cursor: pointer;
+  font-size: 18px; padding: 4px;
+}
+.modal-close:hover { color: var(--accent); }
+.roulette-box {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  text-align: center;
+  margin-bottom: 24px;
+  min-height: 90px;
+  display: flex; align-items: center; justify-content: center;
+}
+.roulette-result {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--ink);
+}
+.roulette-hint {
+  color: var(--ink-3);
+  font-style: italic;
+  font-size: 14px;
+}
+.modal-actions {
+  display: flex; gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Simulation overlay */
+.sim-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: var(--paper);
+  z-index: 200;
+  flex-direction: column;
+  overflow: auto;
+}
+.sim-overlay.open { display: flex; }
+.sim-header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 24px 48px;
+  border-bottom: 1px solid var(--rule);
+}
+.sim-title-block .label { display: block; margin-bottom: 4px; }
+.sim-title-block h2 {
+  font-size: 22px;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 36;
+}
+.sim-close {
+  background: none; border: none;
+  color: var(--ink-3); cursor: pointer;
+  font-size: 20px; padding: 8px;
+  margin-left: auto;
+}
+.sim-close:hover { color: var(--accent); }
+.sim-body {
+  flex: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 32px 48px;
+}
+.sim-timer-box {
+  text-align: center;
+  padding: 48px 32px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  margin-bottom: 32px;
+}
+.sim-clock {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 300;
+  font-variation-settings: 'opsz' 144;
+  font-size: clamp(72px, 12vw, 112px);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 24px;
+}
+.sim-clock.warning { color: #b8741f; }
+.sim-clock.danger { color: var(--red); }
+.timer-progress {
+  height: 2px;
+  background: var(--rule);
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.timer-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 1s linear;
+}
+.sim-timer-btns {
+  display: flex; gap: 10px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.sim-duration-btns {
+  display: flex; gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.sim-duration-btns .label { margin-right: 6px; }
+.dur-btn {
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 6px 14px;
+  color: var(--ink-2);
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.dur-btn:hover { border-color: var(--ink-4); color: var(--ink); }
+.dur-btn.selected {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.sim-text-box {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: 32px;
+}
+.sim-passage {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.85;
+  color: var(--ink);
+}
+.sim-passage p { margin-bottom: 1.2em; }
+
+/* Hidden file input */
+.hidden-file-input { display: none; }
+
+/* Selection */
+::selection { background: var(--accent); color: var(--paper); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-4); }
+
+/* Animations */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: rise 0.4s ease forwards; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinning {
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────── */
+@media (max-width: 900px) {
+  .topbar { padding: 18px 24px; }
+  #library .header { padding: 36px 24px 24px; grid-template-columns: 1fr; }
+  #library .grid-wrap { padding: 24px 24px 60px; }
+  .lib-actions { justify-content: flex-start; }
+  #new-text .container { padding: 36px 24px 60px; }
+  .study-topbar { padding: 16px 24px; grid-template-columns: 1fr; gap: 12px; }
+  .steps-nav { padding: 0 24px; }
+  .step-content { padding: 32px 24px; }
+  .step-footer { padding: 18px 24px; }
+  .fields-grid { grid-template-columns: 1fr; gap: 24px; }
+  .phrases-layout { grid-template-columns: 1fr; gap: 24px; }
+  .analysis-panel { position: static; }
+  .sim-header { padding: 18px 24px; }
+  .sim-body { padding: 24px; }
+  .sim-text-box { padding: 24px; }
+}
+@media (max-width: 480px) {
+  body { font-size: 16px; }
+  .topbar { padding: 14px 18px; }
+  .topbar a, .topbar-right { font-size: 13px; }
+  #library .header { padding: 28px 18px 20px; }
+  #library h1 { font-size: 38px; }
+  #library .subtitle { font-size: 15px; }
+  #library .grid-wrap { padding: 18px 18px 48px; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .text-card { padding: 22px; min-height: auto; }
+  .text-card h3 { font-size: 20px; }
+  .text-card .card-actions { opacity: 1; }
+  #new-text .container { padding: 28px 18px 48px; }
+  .page-title { font-size: 32px; }
+  .stats-row { gap: 24px; }
+  .stat .stat-num { font-size: 24px; }
+  .study-topbar { padding: 14px 18px; }
+  .study-tools { flex-wrap: wrap; }
+  .steps-nav { padding: 0 18px; }
+  .step-tab { padding: 14px 20px 14px 0; margin-right: 16px; font-size: 14px; }
+  .step-roman { font-size: 18px; }
+  .step-content { padding: 24px 18px; }
+  .step-footer { padding: 14px 18px; }
+  .stage-hint { font-size: 17px; padding-left: 14px; }
+  .passage-panel { font-size: 17px; line-height: 1.8; }
+  .analysis-panel { padding: 18px; }
+  .sim-header { padding: 14px 18px; flex-wrap: wrap; }
+  .sim-body { padding: 18px; }
+  .sim-timer-box { padding: 32px 20px; margin-bottom: 24px; }
+  .sim-text-box { padding: 18px; }
+  .sim-passage { font-size: 16px; line-height: 1.8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Hidden file input for import -->
+<input type="file" id="import-file" class="hidden-file-input" accept=".json,application/json" onchange="importAllTexts(event)">
+
+<div class="shell">
+
+  <!-- ═══════════════ TOP BAR (always visible) ═══════════════ -->
+  <header class="topbar">
+    <a href="/" class="home">teliamoreau.com</a>
+    <div class="topbar-right">
+      <button class="theme-btn" id="theme-toggle" onclick="toggleTheme()" title="Changer le thème">Thème</button>
+    </div>
+  </header>
+
+  <!-- ═══════════════ LIBRARY VIEW ═══════════════ -->
+  <div id="library" class="view active">
+    <div class="header">
+      <div class="title-block">
+        <span class="eyebrow">Bibliothèque</span>
+        <h1>Mes <em>textes</em></h1>
+        <p class="subtitle">Tes passages, problématiques et plans d'oral, rassemblés au même endroit.</p>
+      </div>
+      <div class="lib-actions">
+        <button class="btn btn-quiet btn-italic" onclick="openRoulette()">Roulette</button>
+        <button class="btn" onclick="exportAllTexts()" title="Télécharger tous tes textes dans un fichier JSON">Exporter</button>
+        <button class="btn" onclick="document.getElementById('import-file').click()" title="Importer un fichier exporté">Importer</button>
+        <button class="btn btn-primary" onclick="newText()">Nouveau texte</button>
+      </div>
+    </div>
+    <div class="grid-wrap">
+      <div class="cards-grid" id="cards-grid">
+        <div class="empty-state" id="empty-state">
+          Aucun texte pour l'instant.<br>
+          <span style="display:inline-block;margin-top:12px;font-size:14px;color:var(--ink-3);font-style:normal;font-family:'Newsreader',Georgia,serif;">Clique sur «&nbsp;Nouveau texte&nbsp;» pour commencer.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ NEW / EDIT TEXT VIEW ═══════════════ -->
+  <div id="new-text" class="view">
+    <div class="container">
+      <button class="page-back" onclick="showView('library')">Retour à la bibliothèque</button>
+      <h1 class="page-title" id="new-text-title">Nouveau <em>texte</em></h1>
+      <p class="page-subtitle">Donne un titre à ton passage, puis colle le texte avec des [crochets] autour des phrases à analyser.</p>
+
+      <div class="stats-row">
+        <div class="stat"><span class="stat-num" id="word-count">0</span><span class="stat-label">Mots</span></div>
+        <div class="stat"><span class="stat-num" id="phrase-count">0</span><span class="stat-label">Phrases marquées</span></div>
+      </div>
+
+      <div class="field-block">
+        <label for="text-title-input">Titre</label>
+        <input type="text" class="input" id="text-title-input" placeholder="Ex. Les Tahitiens — Bougainville">
+      </div>
+
+      <div class="help-box">
+        Colle le passage ci-dessous. Utilise des <code>[crochets]</code> autour des phrases que tu veux analyser. Par exemple : <code>C'était le [meilleur des temps], c'était le [pire des temps]</code>.<br>
+        Tu peux aussi noter une correction modèle après une barre <code>|</code> : <code>[meilleur des temps | antithèse, hyperbole, registre épique]</code>.
+      </div>
+
+      <div class="field-block">
+        <label for="passage-input">Passage</label>
+        <textarea class="textarea large" id="passage-input" placeholder="Colle ton texte ici avec [phrases clés | analyse modèle] entre crochets..." oninput="updateStats()"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn" onclick="showView('library')">Enregistrer dans la bibliothèque</button>
+        <button class="btn btn-primary" onclick="saveAndStudy()">Enregistrer et étudier →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ STUDY VIEW ═══════════════ -->
+  <div id="study" class="view">
+    <div class="study-topbar">
+      <button class="study-back" onclick="showView('library')">Bibliothèque</button>
+      <div class="study-title-wrap">
+        <h2 id="study-title-display">—</h2>
+        <p class="study-meta" id="study-meta">0/0 phrases · 0/0 champs · 0 mots écrits</p>
+      </div>
+      <div class="study-progress-wrap">
+        <span class="study-pct" id="study-pct">0%</span>
+        <div class="study-bar"><div class="study-bar-fill" id="study-bar-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="study-tools" style="padding: 12px 48px; border-bottom: 1px solid var(--rule); justify-content: flex-end;">
+      <button class="tool-btn" onclick="checkOublis()">Vérifier les oublis</button>
+      <button class="tool-btn" onclick="openSimulation()">Simulation</button>
+      <button class="tool-btn" onclick="exportText()">Exporter ce texte</button>
+    </div>
+
+    <nav class="steps-nav">
+      <div class="step-tab active" id="tab-1" onclick="gotoStep(1)">
+        <span class="step-roman">I.</span>
+        <span class="step-name">Cadre</span>
+      </div>
+      <div class="step-tab locked" id="tab-2" onclick="gotoStep(2)">
+        <span class="step-roman">II.</span>
+        <span class="step-name">Phrases</span>
+      </div>
+      <div class="step-tab locked" id="tab-3" onclick="gotoStep(3)">
+        <span class="step-roman">III.</span>
+        <span class="step-name">Synthèse</span>
+      </div>
+    </nav>
+
+    <!-- STEP 1 -->
+    <div id="step-1" class="step-content">
+      <div class="stage-hint">Commence par poser le cadre : ta problématique, les mouvements du texte et ton introduction. Ces trois champs débloqueront l'analyse des phrases.</div>
+      <div class="fields-grid">
+        <div class="field-card">
+          <div class="field-roman">i.</div>
+          <div class="field-title">Problématique</div>
+          <div class="field-subtitle">La question qui guide ta lecture du texte.</div>
+          <textarea class="textarea" id="problematique" placeholder="En quoi ce texte... ?" oninput="updateProgress()" rows="5"></textarea>
+        </div>
+        <div class="field-card">
+          <div class="field-roman">ii.</div>
+          <div class="field-title">Mouvements</div>
+          <div class="field-subtitle">Au moins 2 ; le 3e est optionnel.</div>
+          <textarea class="textarea" id="mouvements" placeholder="I. ...&#10;II. ...&#10;III. ... (optionnel)" oninput="updateProgress()" rows="5"></textarea>
+        </div>
+        <div class="field-card full">
+          <div class="field-roman">iii.</div>
+          <div class="field-title">Introduction</div>
+          <div class="field-subtitle">Auteur, œuvre, contexte, jusqu'à ta problématique.</div>
+          <textarea class="textarea" id="introduction" placeholder="Présentation, situation du texte, problématique, annonce du plan..." oninput="updateProgress()" rows="5"></textarea>
+        </div>
+      </div>
+      <div class="step-footer">
+        <span class="step-footer-hint" id="step1-hint">Remplis problématique, mouvements et introduction pour continuer.</span>
+        <button class="btn btn-primary" onclick="gotoStep(2)">Étape suivante →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="step-2" class="step-content" style="display:none">
+      <div id="review-banner-container"></div>
+      <div id="oublis-notice-container"></div>
+      <div class="phrases-layout">
+        <div class="passage-panel" id="passage-rendered"></div>
+        <aside class="analysis-panel">
+          <div class="panel-nav">
+            <span class="panel-counter" id="phrase-counter-label">Phrase <strong>1</strong> sur 0</span>
+            <div class="panel-nav-btns">
+              <button onclick="prevPhrase()" title="Précédente">‹</button>
+              <button onclick="nextPhrase()" title="Suivante">›</button>
+            </div>
+          </div>
+          <div class="panel-phrase-text" id="panel-phrase-text">—</div>
+          <div class="phantom-row">
+            <button class="masquer-btn" id="masquer-btn" onclick="toggleCorrection()">Masquer la correction</button>
+            <div class="toggle-wrap">
+              <span>Mode fantôme</span>
+              <label class="toggle"><input type="checkbox" id="phantom-toggle" onchange="togglePhantom()"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="correction-area" id="correction-area">
+            <div class="correction-label">Correction modèle</div>
+            <div class="correction-text" id="correction-text">—</div>
+          </div>
+          <div class="analysis-input-area">
+            <div class="label-line">Ton analyse</div>
+            <textarea class="analysis-textarea" id="analysis-input" placeholder="Écris ton analyse ici..." rows="3" oninput="saveCurrentAnalysis()"></textarea>
+          </div>
+          <div class="autoeval-row">
+            <button class="autoeval-btn correct" id="btn-correct" onclick="markPhrase('correct')"><span class="glyph">✓</span> Correct</button>
+            <button class="autoeval-btn revoir" id="btn-revoir" onclick="markPhrase('revoir')"><span class="glyph">↻</span> À revoir</button>
+          </div>
+          <div class="kbd-hint"><kbd>Enter</kbd> suivante · <kbd>C</kbd> correct · <kbd>R</kbd> à revoir</div>
+        </aside>
+      </div>
+      <div class="step-footer" style="margin-top: 32px;">
+        <button class="btn" onclick="gotoStep(1)">← Cadre</button>
+        <span id="step2-status" class="step-footer-hint">0 phrases analysées</span>
+        <button class="btn btn-primary" onclick="gotoStep(3)">Synthèse →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="step-3" class="step-content" style="display:none">
+      <div class="stage-hint">Pour chaque mouvement, note la mini-conclusion et la transition. Termine par la conclusion générale et l'ouverture.</div>
+      <div id="synthese-mouvements"></div>
+      <div class="synthese-block">
+        <div class="roman-num">Conclusion</div>
+        <h3>Bilan & ouverture</h3>
+        <div class="synthese-field">
+          <div class="synthese-field-label">Bilan général <span class="field-state empty" id="bilan-tag">vide</span></div>
+          <textarea class="synthese-textarea" id="bilan" placeholder="Réponds à ta problématique..." oninput="updateProgress()" rows="3"></textarea>
+        </div>
+        <div class="synthese-field">
+          <div class="synthese-field-label">Ouverture <span class="field-state empty" id="ouverture-tag">vide</span></div>
+          <textarea class="synthese-textarea" id="ouverture" placeholder="Vers une autre œuvre, une autre question..." oninput="updateProgress()" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="step-footer">
+        <button class="btn" onclick="gotoStep(2)">← Phrases</button>
+        <span class="step-footer-hint ready">Étape finale</span>
+        <button class="btn btn-primary" onclick="showView('library')">Retour à la bibliothèque</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SIMULATION OVERLAY ═══════════════ -->
+<div class="sim-overlay" id="sim-overlay">
+  <div class="sim-header">
+    <div class="sim-title-block">
+      <span class="label">Simulation orale</span>
+      <h2 id="sim-sub">—</h2>
+    </div>
+    <button class="sim-close" onclick="closeSimulation()" aria-label="Fermer">×</button>
+  </div>
+  <div class="sim-body">
+    <div class="sim-timer-box">
+      <div class="sim-clock" id="sim-clock">05:00</div>
+      <div class="timer-progress"><div class="timer-progress-fill" id="timer-bar" style="width:100%"></div></div>
+      <div class="sim-timer-btns">
+        <button class="btn btn-primary" id="sim-start-btn" onclick="toggleTimer()">▶ Démarrer</button>
+        <button class="btn" onclick="resetTimer()">↺ Réinitialiser</button>
+      </div>
+      <div class="sim-duration-btns">
+        <span class="label">Durée</span>
+        <button class="dur-btn selected" onclick="setDuration(5, this)">5 min</button>
+        <button class="dur-btn" onclick="setDuration(8, this)">8 min</button>
+        <button class="dur-btn" onclick="setDuration(10, this)">10 min</button>
+        <button class="dur-btn" onclick="setDuration(12, this)">12 min</button>
+      </div>
+      <div class="kbd-hint" style="margin-top:18px;"><kbd>Espace</kbd> démarrer/pause · <kbd>Échap</kbd> quitter</div>
+    </div>
+    <div class="sim-text-box">
+      <div class="label" style="margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--rule);">Texte affiché — tes notes sont cachées</div>
+      <div class="sim-passage" id="sim-passage"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ROULETTE MODAL ═══════════════ -->
+<div class="modal-overlay" id="roulette-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeRoulette()" aria-label="Fermer">×</button>
+    <h2>Roulette des <em>textes</em></h2>
+    <p>Laisse le hasard choisir ton prochain texte à travailler.</p>
+    <div class="roulette-box" id="roulette-box">
+      <span class="roulette-hint">Clique sur «&nbsp;Lancer la roue&nbsp;» pour tirer un texte au hasard.</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="spinRoulette()">Lancer la roue</button>
+      <button class="btn btn-primary" id="open-roulette-result" onclick="openRouletteResult()" style="display:none">Ouvrir ce texte</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+let texts = JSON.parse(localStorage.getItem('revision_texts') || '[]');
+let currentTextId = null;
+let currentStep = 1;
+let currentPhraseIdx = 0;
+let phrases = []; // [{text, correction, analysis, status}]
+let correctionVisible = true;
+let phantomMode = false;
+let timerInterval = null;
+let timerDuration = 5 * 60;
+let timerRemaining = 5 * 60;
+let timerRunning = false;
+let rouletteResult = null;
+let unlockedSteps = new Set([1]);
+let reviewMode = false;
+let reviewIndices = [];
+
+function save() {
+  localStorage.setItem('revision_texts', JSON.stringify(texts));
+}
+
+// ═══════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+(function(){
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = saved || (prefersDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+
+// ═══════════════════════════════════════════════
+// VIEWS
+// ═══════════════════════════════════════════════
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  if(id === 'library') renderLibrary();
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════
+// LIBRARY
+// ═══════════════════════════════════════════════
+function renderLibrary() {
+  const grid = document.getElementById('cards-grid');
+  const empty = document.getElementById('empty-state');
+  if(texts.length === 0) { grid.innerHTML = ''; grid.appendChild(empty); return; }
+  grid.innerHTML = '';
+  texts.forEach((t, i) => {
+    const phrasesData = extractPhrases(t.passage);
+    if(t.phraseStatus) phrasesData.forEach((p, idx) => { p.status = t.phraseStatus[idx] || null; });
+    if(t.phraseAnalyses) phrasesData.forEach((p, idx) => { if(t.phraseAnalyses[idx]) p.analysis = t.phraseAnalyses[idx]; });
+    const filled = phrasesData.filter(p => p.analysis && p.analysis.trim()).length;
+    const correctCount = phrasesData.filter(p => p.status === 'correct').length;
+    const revoirCount = phrasesData.filter(p => p.status === 'revoir').length;
+    const pct = phrasesData.length ? Math.round(filled / phrasesData.length * 100) : 0;
+    const previewText = phrasesData.map(p => p.correction || p.text).slice(0, 3).join(' / ') ||
+                        t.passage.replace(/\[([^\]|]+)(?:\|[^\]]+)?\]/g, '$1').slice(0, 140) + '…';
+
+    let statusHtml = '';
+    if(correctCount) statusHtml += `<span class="status-dot correct">${correctCount}</span>`;
+    if(revoirCount) statusHtml += `<span class="status-dot revoir">${revoirCount}</span>`;
+
+    const card = document.createElement('article');
+    card.className = 'text-card fade-up';
+    card.style.animationDelay = (i * 0.04) + 's';
+    card.onclick = () => openText(i);
+    card.innerHTML = `
+      <div class="card-actions">
+        <button class="card-action-btn edit" onclick="event.stopPropagation(); editText(${i})" title="Modifier le titre ou le passage" aria-label="Modifier">✎</button>
+        <button class="card-action-btn delete" onclick="event.stopPropagation(); deleteText(${i})" title="Supprimer ce texte" aria-label="Supprimer">×</button>
+      </div>
+      <div class="card-num">№ ${String(i+1).padStart(2,'0')}</div>
+      <h3>${escapeHtml(t.title || 'Sans titre')}</h3>
+      <div class="preview">${escapeHtml(previewText)}</div>
+      <div class="card-foot">
+        <span>${phrasesData.length} phrase${phrasesData.length > 1 ? 's' : ''}</span>
+        <span class="status-dots">${statusHtml || `<span class="progress-num">${pct}%</span>`}</span>
+      </div>
+      <div class="progress-line" style="width:${pct}%"></div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ═══════════════════════════════════════════════
+// PARSE PASSAGE
+// ═══════════════════════════════════════════════
+function extractPhrases(passage) {
+  const results = [];
+  const regex = /\[([^\]]+)\]/g;
+  let m;
+  while((m = regex.exec(passage)) !== null) {
+    const inner = m[1];
+    const parts = inner.split('|');
+    results.push({ text: parts[0].trim(), correction: parts[1] ? parts[1].trim() : '', analysis: '', status: null });
+  }
+  return results;
+}
+
+function renderPassage(passage, phrasesArr, activeIdx) {
+  let html = passage;
+  let idx = 0;
+  html = html.replace(/\[([^\]]+)\]/g, (match, inner) => {
+    const parts = inner.split('|');
+    const txt = escapeHtml(parts[0].trim());
+    const ph = phrasesArr && phrasesArr[idx];
+    const statusCls = ph && ph.status ? ' status-' + ph.status : '';
+    const cls = (idx === activeIdx ? 'phrase-highlight active' : 'phrase-highlight') + statusCls;
+    const i = idx;
+    idx++;
+    return `<span class="${cls}" data-idx="${i}" onclick="selectPhrase(${i})">${txt}</span>`;
+  });
+  // paragraph breaks
+  html = html.split(/\n\n+/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+  return html;
+}
+
+// ═══════════════════════════════════════════════
+// NEW / EDIT TEXT
+// ═══════════════════════════════════════════════
+function updateStats() {
+  const val = document.getElementById('passage-input').value;
+  const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+  const matches = val.match(/\[[^\]]+\]/g) || [];
+  document.getElementById('word-count').textContent = words;
+  document.getElementById('phrase-count').textContent = matches.length;
+}
+
+function newText() {
+  currentTextId = null;
+  document.getElementById('new-text-title').innerHTML = 'Nouveau <em>texte</em>';
+  document.getElementById('text-title-input').value = '';
+  document.getElementById('passage-input').value = '';
+  updateStats();
+  showView('new-text');
+}
+
+function editText(idx) {
+  const t = texts[idx];
+  if(!t) return;
+  currentTextId = t.id;
+  document.getElementById('new-text-title').innerHTML = 'Modifier le <em>texte</em>';
+  document.getElementById('text-title-input').value = t.title || '';
+  document.getElementById('passage-input').value = t.passage || '';
+  updateStats();
+  showView('new-text');
+}
+
+function deleteText(idx) {
+  const t = texts[idx];
+  if(!t) return;
+  const ok = confirm(`Supprimer "${t.title || 'Sans titre'}" ?\n\nCette action est définitive. Tout ce que tu as écrit (analyses, synthèse, statuts) sera perdu.`);
+  if(!ok) return;
+  texts.splice(idx, 1);
+  save();
+  renderLibrary();
+}
+
+function saveAndStudy() {
+  const title = document.getElementById('text-title-input').value.trim();
+  const passage = document.getElementById('passage-input').value.trim();
+  if(!title || !passage) {
+    showInlineNotice('oublis-notice-container', 'Remplis le titre et le passage avant d\'enregistrer.', 'error');
+    document.getElementById('text-title-input').focus();
+    return;
+  }
+  if(currentTextId !== null) {
+    const idx = texts.findIndex(t => t.id === currentTextId);
+    if(idx >= 0) {
+      texts[idx] = {...texts[idx], title, passage};
+      save();
+      openText(idx);
+      return;
+    }
+  }
+  const id = Date.now();
+  const newT = { id, title, passage, problematique:'', mouvements:'', introduction:'', bilan:'', ouverture:'', synthese:[], phraseAnalyses:[], phraseStatus:[] };
+  texts.push(newT);
+  save();
+  openText(texts.length - 1);
+}
+
+// ═══════════════════════════════════════════════
+// OPEN TEXT (study mode)
+// ═══════════════════════════════════════════════
+function openText(idx) {
+  currentTextId = texts[idx].id;
+  const t = texts[idx];
+  phrases = extractPhrases(t.passage);
+  if(t.phraseAnalyses) phrases.forEach((p, i) => { if(t.phraseAnalyses[i]) p.analysis = t.phraseAnalyses[i]; });
+  if(t.phraseStatus) phrases.forEach((p, i) => { if(t.phraseStatus[i]) p.status = t.phraseStatus[i]; });
+  currentPhraseIdx = 0;
+  reviewMode = false;
+  reviewIndices = [];
+  unlockedSteps = new Set([1]);
+  document.getElementById('study-title-display').textContent = t.title;
+  document.getElementById('problematique').value = t.problematique || '';
+  document.getElementById('mouvements').value = t.mouvements || '';
+  document.getElementById('introduction').value = t.introduction || '';
+  buildSyntheseFields(t);
+  updateProgress();
+  showView('study');
+  gotoStep(1);
+}
+
+function buildSyntheseFields(t) {
+  const movs = (t.mouvements || '').split('\n').filter(l => l.trim());
+  const container = document.getElementById('synthese-mouvements');
+  container.innerHTML = '';
+  const saved = t.synthese || [];
+  movs.forEach((mov, i) => {
+    const s = saved[i] || {};
+    const optional = i >= 2;
+    const div = document.createElement('div');
+    div.className = 'synthese-block';
+    div.innerHTML = `
+      <div class="roman-num">${romanize(i+1)}</div>
+      <h3>${escapeHtml(mov || 'Mouvement ' + (i+1))}${optional ? '<span class="opt-tag">— optionnel</span>' : ''}</h3>
+      <div class="synthese-field">
+        <div class="synthese-field-label">Mini-conclusion <span class="field-state ${s.miniconclusion ? 'filled' : 'empty'}" id="stag-mc-${i}">${s.miniconclusion ? 'rempli' : 'vide'}</span></div>
+        <textarea class="synthese-textarea" id="s-mc-${i}" placeholder="Bilan de la partie..." rows="2" oninput="updateSynthese(${i})">${escapeHtml(s.miniconclusion || '')}</textarea>
+      </div>
+      <div class="synthese-field">
+        <div class="synthese-field-label">Transition <span class="field-state ${s.transition ? 'filled' : 'empty'}" id="stag-tr-${i}">${s.transition ? 'rempli' : 'vide'}</span></div>
+        <textarea class="synthese-textarea" id="s-tr-${i}" placeholder="Vers la partie suivante..." rows="2" oninput="updateSynthese(${i})">${escapeHtml(s.transition || '')}</textarea>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+  document.getElementById('bilan').value = t.bilan || '';
+  document.getElementById('ouverture').value = t.ouverture || '';
+}
+
+function romanize(n) {
+  const map = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+  return map[n] || ('Mvt ' + n);
+}
+
+function updateSynthese(i) {
+  const t = texts.find(x => x.id === currentTextId);
+  if(!t) return;
+  if(!t.synthese) t.synthese = [];
+  if(!t.synthese[i]) t.synthese[i] = {};
+  t.synthese[i].miniconclusion = document.getElementById(`s-mc-${i}`)?.value || '';
+  t.synthese[i].transition = document.getElementById(`s-tr-${i}`)?.value || '';
+  ['mc', 'tr'].forEach(k => {
+    const el = document.getElementById(`stag-${k}-${i}`);
+    const val = k === 'mc' ? t.synthese[i].miniconclusion : t.synthese[i].transition;
+    if(el) {
+      el.textContent = val ? 'rempli' : 'vide';
+      el.className = 'field-state ' + (val ? 'filled' : 'empty');
+    }
+  });
+  save();
+  updateProgress();
+}
+
+// ═══════════════════════════════════════════════
+// STEPS
+// ═══════════════════════════════════════════════
+function gotoStep(n) {
+  if(n > 1 && !unlockedSteps.has(n)) unlockStep(n);
+  currentStep = n;
+  [1, 2, 3].forEach(i => {
+    const tab = document.getElementById(`tab-${i}`);
+    const content = document.getElementById(`step-${i}`);
+    content.style.display = i === n ? 'block' : 'none';
+    tab.classList.remove('active', 'done', 'locked');
+    if(i < n) tab.classList.add('done');
+    else if(i === n) tab.classList.add('active');
+    else if(!unlockedSteps.has(i)) tab.classList.add('locked');
+  });
+  if(n === 2) renderPhraseStep();
+  // remove any pending notice when changing step
+  document.getElementById('oublis-notice-container').innerHTML = '';
+}
+
+function unlockStep(n) { unlockedSteps.add(n); }
+
+function renderPhraseStep() {
+  const t = texts.find(x => x.id === currentTextId);
+  if(!t) return;
+  const panel = document.getElementById('passage-rendered');
+  panel.innerHTML = renderPassage(t.passage, phrases, currentPhraseIdx);
+  selectPhrase(currentPhraseIdx);
+}
+
+function selectPhrase(idx) {
+  saveCurrentAnalysis();
+  currentPhraseIdx = idx;
+  document.querySelectorAll('.phrase-highlight').forEach(el => {
+    el.classList.toggle('active', parseInt(el.dataset.idx) === idx);
+  });
+  const p = phrases[idx];
+  if(!p) return;
+  const counterEl = document.getElementById('phrase-counter-label');
+  if(reviewMode) {
+    counterEl.innerHTML = `Révision <strong>${reviewIndices.indexOf(idx)+1}</strong> sur ${reviewIndices.length}`;
+  } else {
+    counterEl.innerHTML = `Phrase <strong>${idx+1}</strong> sur ${phrases.length}`;
+  }
+  document.getElementById('panel-phrase-text').textContent = p.text;
+  document.getElementById('correction-text').textContent = p.correction || '(pas de correction modèle)';
+  document.getElementById('analysis-input').value = p.analysis || '';
+  document.getElementById('step2-status').textContent = `${phrases.filter(x => x.analysis?.trim()).length}/${phrases.length} phrases analysées`;
+  // toggle button states
+  const btnC = document.getElementById('btn-correct');
+  const btnR = document.getElementById('btn-revoir');
+  if(btnC && btnR) {
+    btnC.classList.toggle('selected', p.status === 'correct');
+    btnR.classList.toggle('selected', p.status === 'revoir');
+  }
+  if(phantomMode) {
+    document.getElementById('correction-area').style.opacity = '0';
+  } else {
+    document.getElementById('correction-area').style.opacity = correctionVisible ? '1' : '0';
+  }
+  document.getElementById('masquer-btn').textContent = correctionVisible ? 'Masquer la correction' : 'Afficher la correction';
+  updateProgress();
+}
+
+function saveCurrentAnalysis() {
+  const input = document.getElementById('analysis-input');
+  if(!input || !phrases[currentPhraseIdx]) return;
+  phrases[currentPhraseIdx].analysis = input.value;
+  const t = texts.find(x => x.id === currentTextId);
+  if(t) {
+    t.phraseAnalyses = phrases.map(p => p.analysis);
+    t.phraseStatus = phrases.map(p => p.status);
+    save();
+  }
+}
+
+function prevPhrase() {
+  saveCurrentAnalysis();
+  if(reviewMode) {
+    const pos = reviewIndices.indexOf(currentPhraseIdx);
+    if(pos > 0) selectPhrase(reviewIndices[pos-1]);
+  } else {
+    if(currentPhraseIdx > 0) selectPhrase(currentPhraseIdx-1);
+  }
+}
+
+function nextPhrase() {
+  saveCurrentAnalysis();
+  if(reviewMode) {
+    const pos = reviewIndices.indexOf(currentPhraseIdx);
+    if(pos < reviewIndices.length-1) selectPhrase(reviewIndices[pos+1]);
+    else endReviewMode();
+  } else {
+    if(currentPhraseIdx < phrases.length-1) selectPhrase(currentPhraseIdx+1);
+    else onAllPhrasesDone();
+  }
+}
+
+function markPhrase(status) {
+  if(!phrases[currentPhraseIdx]) return;
+  saveCurrentAnalysis();
+  phrases[currentPhraseIdx].status = status;
+  const t = texts.find(x => x.id === currentTextId);
+  if(t) { t.phraseStatus = phrases.map(p => p.status); save(); }
+  const span = document.querySelector(`.phrase-highlight[data-idx="${currentPhraseIdx}"]`);
+  if(span) {
+    span.classList.remove('status-correct', 'status-revoir');
+    span.classList.add('status-' + status);
+  }
+  document.getElementById('btn-correct').classList.toggle('selected', status === 'correct');
+  document.getElementById('btn-revoir').classList.toggle('selected', status === 'revoir');
+  setTimeout(() => nextPhrase(), 200);
+}
+
+function onAllPhrasesDone() {
+  const revoirCount = phrases.filter(p => p.status === 'revoir').length;
+  if(revoirCount > 0 && !reviewMode) {
+    showReviewBanner(revoirCount);
+  } else {
+    document.getElementById('review-banner-container').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+
+function showReviewBanner(count) {
+  const container = document.getElementById('review-banner-container');
+  container.innerHTML = `
+    <div class="review-banner">
+      <div class="text">
+        Tu as ${count} phrase${count>1?'s':''} marquée${count>1?'s':''} «&nbsp;à revoir&nbsp;».
+        <small>Mode révision ciblée : ne reparcourir que celles-là pour t'entraîner.</small>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-quiet" onclick="dismissReviewBanner()">Plus tard</button>
+        <button class="btn btn-accent" onclick="startReviewMode()">Démarrer la révision</button>
+      </div>
+    </div>`;
+  container.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function dismissReviewBanner() {
+  document.getElementById('review-banner-container').innerHTML = '';
+}
+
+function startReviewMode() {
+  reviewIndices = phrases.map((p, i) => p.status === 'revoir' ? i : -1).filter(i => i >= 0);
+  if(reviewIndices.length === 0) { dismissReviewBanner(); return; }
+  reviewMode = true;
+  dismissReviewBanner();
+  // add pill in panel header
+  const counterWrap = document.getElementById('phrase-counter-label');
+  if(counterWrap && !document.getElementById('review-mode-pill')) {
+    const pill = document.createElement('span');
+    pill.className = 'review-mode-pill';
+    pill.textContent = '↻ Mode révision';
+    pill.id = 'review-mode-pill';
+    counterWrap.parentElement.appendChild(pill);
+  }
+  selectPhrase(reviewIndices[0]);
+}
+
+function endReviewMode() {
+  reviewMode = false;
+  const lastIdx = reviewIndices[reviewIndices.length-1] || 0;
+  reviewIndices = [];
+  const pill = document.getElementById('review-mode-pill');
+  if(pill) pill.remove();
+  const container = document.getElementById('review-banner-container');
+  container.innerHTML = `
+    <div class="review-banner success">
+      <div class="text">
+        Révision terminée.
+        <small>Marque «&nbsp;Correct&nbsp;» sur les phrases acquises pour les sortir du mode révision.</small>
+      </div>
+      <button class="btn" onclick="dismissReviewBanner()">OK</button>
+    </div>`;
+  selectPhrase(lastIdx);
+}
+
+function toggleCorrection() {
+  correctionVisible = !correctionVisible;
+  document.getElementById('correction-area').style.opacity = correctionVisible ? '1' : '0';
+  document.getElementById('masquer-btn').textContent = correctionVisible ? 'Masquer la correction' : 'Afficher la correction';
+}
+
+function togglePhantom() {
+  phantomMode = document.getElementById('phantom-toggle').checked;
+  document.getElementById('correction-area').style.opacity = phantomMode ? '0' : (correctionVisible ? '1' : '0');
+}
+
+// ═══════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════
+function updateProgress() {
+  const t = texts.find(x => x.id === currentTextId);
+  if(!t) return;
+  t.problematique = document.getElementById('problematique')?.value || '';
+  t.mouvements = document.getElementById('mouvements')?.value || '';
+  t.introduction = document.getElementById('introduction')?.value || '';
+  t.bilan = document.getElementById('bilan')?.value || '';
+  t.ouverture = document.getElementById('ouverture')?.value || '';
+  save();
+  const step1Fields = [t.problematique, t.mouvements, t.introduction].filter(f => f.trim()).length;
+  const analysedPhrases = phrases.filter(p => p.analysis?.trim()).length;
+  const movs = (t.mouvements || '').split('\n').filter(l => l.trim());
+  const movCount = movs.length;
+  const syntheseFields = (t.synthese || []).flatMap(s => [s.miniconclusion, s.transition]).filter(f => f?.trim()).length;
+  let totalSyntheseFields = Math.min(movCount, 2) * 2;
+  for(let i = 2; i < movCount; i++) {
+    const s = (t.synthese || [])[i] || {};
+    if(s.miniconclusion?.trim() || s.transition?.trim()) totalSyntheseFields += 2;
+  }
+  totalSyntheseFields += 2;
+  const bilanFilled = (t.bilan?.trim() ? 1 : 0) + (t.ouverture?.trim() ? 1 : 0);
+  const total = 3 + phrases.length + totalSyntheseFields;
+  const done = step1Fields + analysedPhrases + syntheseFields + bilanFilled;
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  document.getElementById('study-pct').textContent = pct + '%';
+  document.getElementById('study-bar-fill').style.width = pct + '%';
+  const wordsWritten = [t.problematique, t.introduction, ...phrases.map(p => p.analysis || ''), ...(t.synthese || []).flatMap(s => [s.miniconclusion || '', s.transition || '']), t.bilan || '', t.ouverture || ''].join(' ').trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('study-meta').textContent = `${analysedPhrases}/${phrases.length} phrases · ${step1Fields}/3 cadre · ${wordsWritten} mots`;
+  const hint = document.getElementById('step1-hint');
+  if(hint) {
+    if(step1Fields === 3) {
+      hint.textContent = '✓ Prêt à analyser les phrases.';
+      hint.classList.add('ready');
+    } else {
+      hint.textContent = 'Remplis problématique, mouvements et introduction pour continuer.';
+      hint.classList.remove('ready');
+    }
+  }
+  if(t.bilan !== undefined) {
+    const bt = document.getElementById('bilan-tag');
+    if(bt) { bt.textContent = t.bilan.trim() ? 'rempli' : 'vide'; bt.className = 'field-state ' + (t.bilan.trim() ? 'filled' : 'empty'); }
+    const ot = document.getElementById('ouverture-tag');
+    if(ot) { ot.textContent = t.ouverture.trim() ? 'rempli' : 'vide'; ot.className = 'field-state ' + (t.ouverture.trim() ? 'filled' : 'empty'); }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// INLINE NOTICES (replace alerts)
+// ═══════════════════════════════════════════════
+function showInlineNotice(containerId, message, type) {
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  const cls = type === 'success' ? 'notice success' : type === 'error' ? 'notice error' : 'notice';
+  container.innerHTML = `
+    <div class="${cls}">
+      <span>${escapeHtml(message)}</span>
+      <button class="dismiss" onclick="this.parentElement.parentElement.innerHTML=''" aria-label="Fermer">×</button>
+    </div>`;
+  container.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ═══════════════════════════════════════════════
+// CHECK OUBLIS
+// ═══════════════════════════════════════════════
+function checkOublis() {
+  if(currentStep !== 2) gotoStep(2);
+  const empty = phrases.map((p, i) => p.analysis?.trim() ? null : i+1).filter(x => x !== null);
+  if(empty.length === 0) {
+    showInlineNotice('oublis-notice-container', 'Toutes les phrases ont été analysées.', 'success');
+  } else {
+    showInlineNotice('oublis-notice-container', `Phrases non analysées : ${empty.join(', ')}.`, '');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// EXPORT (single text, .txt)
+// ═══════════════════════════════════════════════
+function exportText() {
+  const t = texts.find(x => x.id === currentTextId);
+  if(!t) return;
+  let out = `# ${t.title}\n\n## Cadre\n**Problématique :** ${t.problematique}\n**Mouvements :**\n${t.mouvements}\n\n**Introduction :** ${t.introduction}\n\n## Phrases clés\n`;
+  phrases.forEach((p, i) => {
+    const statusLabel = p.status === 'correct' ? ' [Correct]' : p.status === 'revoir' ? ' [À revoir]' : '';
+    out += `\n${i+1}. "${p.text}"${statusLabel}\n  Analyse : ${p.analysis || '—'}\n  Correction : ${p.correction || '—'}\n`;
+  });
+  out += `\n## Synthèse\n`;
+  (t.synthese || []).forEach((s, i) => {
+    out += `\n### Mouvement ${i+1}\n- Mini-conclusion : ${s.miniconclusion || '—'}\n- Transition : ${s.transition || '—'}\n`;
+  });
+  out += `\n## Conclusion\n${t.bilan}\nOuverture : ${t.ouverture}`;
+  const blob = new Blob([out], {type: 'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (t.title || 'texte') + '.txt';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════
+// EXPORT / IMPORT JSON (all texts)
+// ═══════════════════════════════════════════════
+function exportAllTexts() {
+  if(texts.length === 0) {
+    showInlineNotice('cards-grid', 'Aucun texte à exporter.', '');
+    return;
+  }
+  const payload = { schemaVersion: 1, exportedAt: new Date().toISOString(), texts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+  const date = new Date().toISOString().slice(0, 10);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `revision-textes-${date}.json`;
+  a.click();
+}
+
+function importAllTexts(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const incoming = Array.isArray(data) ? data : data.texts;
+      if(!Array.isArray(incoming)) throw new Error('Format invalide');
+      let added = 0, skipped = 0;
+      incoming.forEach(t => {
+        if(!t || !t.id || !t.title) { skipped++; return; }
+        if(texts.some(x => x.id === t.id)) { skipped++; return; }
+        texts.push(t);
+        added++;
+      });
+      save();
+      renderLibrary();
+      alert(`Import terminé : ${added} texte${added>1?'s':''} ajouté${added>1?'s':''}, ${skipped} ignoré${skipped>1?'s':''} (déjà présent ou invalide).`);
+    } catch(err) {
+      alert('Erreur de lecture du fichier : ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ═══════════════════════════════════════════════
+// SIMULATION
+// ═══════════════════════════════════════════════
+function openSimulation() {
+  const t = texts.find(x => x.id === currentTextId);
+  if(!t) return;
+  document.getElementById('sim-sub').textContent = t.title || '—';
+  const simPassage = document.getElementById('sim-passage');
+  simPassage.innerHTML = renderPassage(t.passage, phrases, -1);
+  document.getElementById('sim-overlay').classList.add('open');
+  resetTimer();
+}
+
+function closeSimulation() {
+  document.getElementById('sim-overlay').classList.remove('open');
+  clearInterval(timerInterval); timerRunning = false;
+  document.getElementById('sim-start-btn').textContent = '▶ Démarrer';
+}
+
+function setDuration(mins, btn) {
+  timerDuration = mins * 60; timerRemaining = timerDuration;
+  document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  updateClock();
+}
+
+function toggleTimer() {
+  if(timerRunning) {
+    clearInterval(timerInterval); timerRunning = false;
+    document.getElementById('sim-start-btn').textContent = '▶ Démarrer';
+  } else {
+    timerRunning = true;
+    document.getElementById('sim-start-btn').textContent = '⏸ Pause';
+    timerInterval = setInterval(tickTimer, 1000);
+  }
+}
+
+function tickTimer() {
+  if(timerRemaining <= 0) {
+    clearInterval(timerInterval); timerRunning = false;
+    document.getElementById('sim-start-btn').textContent = '▶ Démarrer';
+    return;
+  }
+  timerRemaining--;
+  updateClock();
+}
+
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false;
+  timerRemaining = timerDuration;
+  document.getElementById('sim-start-btn').textContent = '▶ Démarrer';
+  updateClock();
+}
+
+function updateClock() {
+  const m = Math.floor(timerRemaining/60).toString().padStart(2, '0');
+  const s = (timerRemaining%60).toString().padStart(2, '0');
+  const clock = document.getElementById('sim-clock');
+  clock.textContent = `${m}:${s}`;
+  clock.className = 'sim-clock' + (timerRemaining < 60 ? ' danger' : timerRemaining < timerDuration*0.25 ? ' warning' : '');
+  document.getElementById('timer-bar').style.width = (timerRemaining/timerDuration*100) + '%';
+}
+
+// ═══════════════════════════════════════════════
+// ROULETTE
+// ═══════════════════════════════════════════════
+function openRoulette() {
+  rouletteResult = null;
+  document.getElementById('roulette-box').innerHTML = '<span class="roulette-hint">Clique sur «&nbsp;Lancer la roue&nbsp;» pour tirer un texte au hasard.</span>';
+  document.getElementById('open-roulette-result').style.display = 'none';
+  document.getElementById('roulette-modal').classList.add('open');
+}
+function closeRoulette() { document.getElementById('roulette-modal').classList.remove('open'); }
+function spinRoulette() {
+  if(texts.length === 0) {
+    document.getElementById('roulette-box').innerHTML = '<span class="roulette-hint">Aucun texte dans la bibliothèque.</span>';
+    return;
+  }
+  const box = document.getElementById('roulette-box');
+  box.innerHTML = '<span class="spinning" style="font-size:24px;color:var(--accent);font-family:Fraunces,serif;font-style:italic;">↻</span>';
+  setTimeout(() => {
+    rouletteResult = Math.floor(Math.random() * texts.length);
+    box.innerHTML = `<span class="roulette-result">${escapeHtml(texts[rouletteResult].title)}</span>`;
+    document.getElementById('open-roulette-result').style.display = 'inline-flex';
+  }, 700);
+}
+function openRouletteResult() {
+  if(rouletteResult === null) return;
+  closeRoulette(); openText(rouletteResult);
+}
+
+// ═══════════════════════════════════════════════
+// KEYBOARD
+// ═══════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if(document.getElementById('sim-overlay').classList.contains('open')) {
+    if(e.code === 'Space') { e.preventDefault(); toggleTimer(); }
+    if(e.code === 'Escape') closeSimulation();
+    return;
+  }
+  if(e.code === 'Escape' && document.getElementById('roulette-modal').classList.contains('open')) {
+    closeRoulette();
+  }
+  if(currentStep === 2) {
+    const inAnalysis = document.activeElement.id === 'analysis-input';
+    if(e.code === 'Enter' && !e.shiftKey && inAnalysis) { e.preventDefault(); nextPhrase(); }
+    if(!inAnalysis) {
+      if(e.key === 'c' || e.key === 'C') { e.preventDefault(); markPhrase('correct'); }
+      if(e.key === 'r' || e.key === 'R') { e.preventDefault(); markPhrase('revoir'); }
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+renderLibrary();
+</script>
+
+</body>
+</html>
